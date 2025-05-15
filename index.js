@@ -35,6 +35,26 @@ async function runDB() {
       const storeUsers = await usersDBCollection.insertOne(users);
       res.send(storeUsers);
     });
+
+    // Search Doner
+    app.get("/searchDoner", async (req, res) => {
+      console.log(req.query);
+      const { bloodGroup, district, upazila } = req.query;
+
+      // Check Doner Search Data
+      if (!bloodGroup && !district && !upazila) {
+        return res.send([]);
+      }
+
+      const query = {};
+      if (bloodGroup) query.bloodGroup = bloodGroup;
+      if (district) query.district = district;
+      if (upazila) query.upazila = upazila;
+
+      const donerFind = await usersDBCollection.find(query).toArray();
+
+      res.send(donerFind);
+    });
   } catch (error) {
     console.log(error);
   }
