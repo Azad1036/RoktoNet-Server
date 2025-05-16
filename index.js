@@ -26,6 +26,7 @@ const client = new MongoClient(uri, {
 async function runDB() {
   const roktoNetDB = client.db("roktoNetDB");
   const usersDBCollection = roktoNetDB.collection("UsersDB");
+  const userDonationRequest = roktoNetDB.collection("donationRequestDB");
 
   try {
     // user register API
@@ -54,6 +55,34 @@ async function runDB() {
       const donerFind = await usersDBCollection.find(query).toArray();
 
       res.send(donerFind);
+    });
+
+    // Single User Profile API
+    app.get("/userProfile/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email };
+      const findUser = await usersDBCollection.findOne(query);
+      res.send(findUser);
+    });
+
+    // Update User Profile
+    app.put("/updateProfile/:email", async (req, res) => {
+      const email = req.params.email;
+      const userUpdateDate = req.body;
+      const query = { email };
+      const update = {
+        $set: userUpdateDate,
+      };
+      const updateProfile = await usersDBCollection.updateOne(query, update);
+      res.send(updateProfile);
+    });
+
+    // DashBoard Page
+    // Donor Dashboard
+    app.post("/create-donation-request", async (req, res) => {
+      const body = req.body;
+      const donationReques = await userDonationRequest.insertOne(body);
+      res.send(donationReques);
     });
   } catch (error) {
     console.log(error);
