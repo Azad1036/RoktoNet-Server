@@ -2,8 +2,19 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 const port = process.env.PORT || 3000;
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
+const corsOptions = {
+  origin: [
+    "http://localhost:5173",
+    "http://localhost:5174",
+    "https://nexdrive-rentals.web.app",
+    "https://quiet-mooncake-d6e5db.netlify.app",
+    "https://nexdrive-rentals.firebaseapp.com",
+  ],
+  credentials: true,
+  optionsSuccessStatus: 200,
+};
 // MedleWare
 app.use(cors());
 app.use(express.json());
@@ -32,7 +43,6 @@ async function runDB() {
     // user register API
     app.post("/users", async (req, res) => {
       const users = req.body;
-      console.log(users);
       const storeUsers = await usersDBCollection.insertOne(users);
       res.send(storeUsers);
     });
@@ -95,6 +105,29 @@ async function runDB() {
         .find(query)
         .toArray();
       res.send(myDonationRequestslist);
+    });
+
+    // Edit Request Api get
+    app.get("/edit-request/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const findEditReq = await userDonationRequest.findOne(query);
+      res.send(findEditReq);
+    });
+
+    // Update Edit Request Api
+    app.put("/update-donation-requests/:id", async (req, res) => {
+      const id = req.params.id;
+      const body = req.body;
+      const query = { _id: new ObjectId(id) };
+      const update = {
+        $set: body,
+      };
+      const updateDonationRequests = await userDonationRequest.updateOne(
+        query,
+        update
+      );
+      res.send(updateDonationRequests);
     });
   } catch (error) {
     console.log(error);
