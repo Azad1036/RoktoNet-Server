@@ -78,11 +78,23 @@ async function runDB() {
     });
 
     // DashBoard Page
-    // Donor Dashboard
+
+    // Donor Dashboard //
+    // Create Donation Request Api
     app.post("/create-donation-request", async (req, res) => {
-      const body = req.body;
-      const donationReques = await userDonationRequest.insertOne(body);
+      const createRequest = req.body;
+      const donationReques = await userDonationRequest.insertOne(createRequest);
       res.send(donationReques);
+    });
+
+    // My Donation Requests Api
+    app.get("/my-donation-requests/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email };
+      const myDonationRequestslist = await userDonationRequest
+        .find(query)
+        .toArray();
+      res.send(myDonationRequestslist);
     });
   } catch (error) {
     console.log(error);
