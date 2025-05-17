@@ -129,6 +129,29 @@ async function runDB() {
       );
       res.send(updateDonationRequests);
     });
+
+    // Deleted Donation Request
+    app.delete("/delete-donation-request/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const deleteRequest = await userDonationRequest.deleteOne(query);
+      res.send(deleteRequest);
+    });
+
+    // Admin Api
+    // All Doner Api
+    app.get("/all-doner", async (req, res) => {
+      const role = req.query.role;
+      const query = role ? { role } : {};
+      const allDoner = await usersDBCollection.find(query).toArray();
+      res.send(allDoner);
+    });
+
+    // All Donation Request Api
+    app.get("/all-donation-request", async (req, res) => {
+      const allDonationRequest = await userDonationRequest.find().toArray();
+      res.send(allDonationRequest);
+    });
   } catch (error) {
     console.log(error);
   }
