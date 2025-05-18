@@ -38,6 +38,7 @@ async function runDB() {
   const roktoNetDB = client.db("roktoNetDB");
   const usersDBCollection = roktoNetDB.collection("UsersDB");
   const userDonationRequest = roktoNetDB.collection("donationRequestDB");
+  const blogPostCollection = roktoNetDB.collection("blogPost");
 
   try {
     // user register API
@@ -151,6 +152,74 @@ async function runDB() {
     app.get("/all-donation-request", async (req, res) => {
       const allDonationRequest = await userDonationRequest.find().toArray();
       res.send(allDonationRequest);
+    });
+
+    // User rols and Status Update
+    app.patch("/users/:id", async (req, res) => {
+      const id = req.params.id;
+      const body = req.body;
+      const query = { _id: new ObjectId(id) };
+      const update = {
+        $set: body,
+      };
+      const updateStatus = await usersDBCollection.updateOne(query, update);
+      res.send(updateStatus);
+    });
+
+    // Admin and Volenteer Blog Post
+    app.post("/blog-post", async (req, res) => {
+      const createRequest = req.body;
+      const blogPost = await blogPostCollection.insertOne(createRequest);
+      res.send(blogPost);
+    });
+
+    // blog post view and read api
+    app.get("/content-view-blog", async (req, res) => {
+      const viewAllBlog = await blogPostCollection.find().toArray();
+      res.send(viewAllBlog);
+    });
+
+    // update blog post
+    app.put("/update-blogPost/:id", async (req, res) => {
+      const body = req.body;
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const update = {
+        $set: body,
+      };
+      const updateBlogPost = await blogPostCollection.updateOne(query, update);
+      res.send(updateBlogPost);
+    });
+
+    // update blog status
+    // app.patch("/update-blog-status/:id", async (req, res) => {
+    //   const body = req.body;
+    //   const id = req.params.id;
+    //   const query = { _id: new ObjectId(id) };
+    //   const update = {
+    //     $set: body,
+    //   };
+    //   const updateBlogStatus = await blogPostCollection.updateOne(
+    //     query,
+    //     update
+    //   );
+    //   res.send(updateBlogStatus);
+    // });
+
+    // Blog Delect By Admin
+    app.delete("/blog-delete/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const deleteBlog = await blogPostCollection.deleteOne(query);
+      res.send(deleteBlog);
+    });
+
+    // Blog Detiles
+    app.get("/blog-details/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const deleteRequest = await blogPostCollection.findOne(query);
+      res.send(deleteRequest);
     });
   } catch (error) {
     console.log(error);
