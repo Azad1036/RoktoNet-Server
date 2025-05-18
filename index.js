@@ -39,6 +39,7 @@ async function runDB() {
   const usersDBCollection = roktoNetDB.collection("UsersDB");
   const userDonationRequest = roktoNetDB.collection("donationRequestDB");
   const blogPostCollection = roktoNetDB.collection("blogPost");
+  const dontationAmountCollection = roktoNetDB.collection("tatalDonation");
 
   try {
     // user register API
@@ -86,6 +87,26 @@ async function runDB() {
       };
       const updateProfile = await usersDBCollection.updateOne(query, update);
       res.send(updateProfile);
+    });
+
+    // view Dontaion Request Page
+    app.get("/donation-request/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const findDonatonReq = await userDonationRequest.findOne(query);
+      res.send(findDonatonReq);
+    });
+
+    // Bload Donation Status Update
+    app.patch("/boold-donation-status/:id", async (req, res) => {
+      const id = req.params.id;
+      const body = req.body;
+      const query = { _id: new ObjectId(id) };
+      const update = {
+        $set: body,
+      };
+      const updateStatus = await userDonationRequest.updateOne(query, update);
+      res.send(updateStatus);
     });
 
     // DashBoard Page
@@ -137,6 +158,18 @@ async function runDB() {
       const query = { _id: new ObjectId(id) };
       const deleteRequest = await userDonationRequest.deleteOne(query);
       res.send(deleteRequest);
+    });
+
+    // View last Status By Doner
+    app.patch("/status-update-donor/:id", async (req, res) => {
+      const id = req.params.id;
+      const body = req.body;
+      const query = { _id: new ObjectId(id) };
+      const update = {
+        $set: body,
+      };
+      const updateStatus = await userDonationRequest.updateOne(query, update);
+      res.send(updateStatus);
     });
 
     // Admin Api
@@ -220,6 +253,19 @@ async function runDB() {
       const query = { _id: new ObjectId(id) };
       const deleteRequest = await blogPostCollection.findOne(query);
       res.send(deleteRequest);
+    });
+
+    // Donation Amount
+    app.post("/donation-amount", async (req, res) => {
+      const body = req.body;
+      const donationAmount = await dontationAmountCollection.insertOne(body);
+      res.send(donationAmount);
+    });
+
+    // Donation Amount All User
+    app.get("/all-donation-user", async (req, res) => {
+      const allUsers = await dontationAmountCollection.find().toArray();
+      res.send(allUsers);
     });
   } catch (error) {
     console.log(error);
