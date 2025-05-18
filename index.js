@@ -225,19 +225,19 @@ async function runDB() {
     });
 
     // update blog status
-    // app.patch("/update-blog-status/:id", async (req, res) => {
-    //   const body = req.body;
-    //   const id = req.params.id;
-    //   const query = { _id: new ObjectId(id) };
-    //   const update = {
-    //     $set: body,
-    //   };
-    //   const updateBlogStatus = await blogPostCollection.updateOne(
-    //     query,
-    //     update
-    //   );
-    //   res.send(updateBlogStatus);
-    // });
+    app.patch("/update-blog-status/:id", async (req, res) => {
+      const body = req.body;
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const update = {
+        $set: body,
+      };
+      const updateBlogStatus = await blogPostCollection.updateOne(
+        query,
+        update
+      );
+      res.send(updateBlogStatus);
+    });
 
     // Blog Delect By Admin
     app.delete("/blog-delete/:id", async (req, res) => {
